@@ -1,12 +1,12 @@
 # How to build
 
-This app could build either with docker 
+This app could be built either with docker 
 
 ```bash
 docker-compose up
 ```
 
-or by Makefile with [wasi-sdk](github.com/CraneStation/wasi-sdk) installed
+or by Makefile with [wasi-sdk](https://github.com/CraneStation/wasi-sdk) installed
 ```bash
 make
 ```
