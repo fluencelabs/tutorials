@@ -1,43 +1,50 @@
 #ifndef FLUENCE_C_SDK_RR_H
 #define FLUENCE_C_SDK_RR_H
-#include "allocator.h
+
+#include "allocator.h"
 #include <string>
 #include <cstdint>
 
+namespace sdk {
+
+/**
+ * Converts request from a raw pointer and size to some C++-structure (like std::string, std::vector).
+ *
+ * @param ptr a pointer to provided request.
+ * @param length a length of provided request.
+ */
 template <typename T>
-T read_request(void *ptr, size_t)
+T read_request(char *ptr, int length) {
+    const auto res = T(ptr, length);
 
-template<>
-std::string read_request(void *ptr, size_t) {
-
+    sdk::deallocate(static_cast<void *>(ptr), 0);
+    return res;
 }
 
-template<>
-std::vector<uint8_t> read_request(void *ptr, size_t) {
+/**
+ * Writes response to format suitable for Wasm VM.
+ *
+ * @param arg a response that should be writed.
+ * @return length a pointer to written buffer.
+ */
+template <typename T>
+char *write_response(const T &arg) {
+    const int RESPONSE_BYTES_COUNT = 4;
+    const auto response = (char *)sdk::allocate(arg.size() + RESPONSE_BYTES_COUNT);
 
+    int byteId = 0;
+    for(; byteId < RESPONSE_BYTES_COUNT; ++byteId) {
+        response[byteId] = (arg.size() >> 8*byteId) & 0xFF;
+    }
+
+    for(const auto &elem: arg) {
+        ++byteId;
+        response[byteId + RESPONSE_BYTES_COUNT] = elem;
+    }
+
+    return response;
 }
 
-template <typename T>
-uintptr_t write_response(T arg);
-
-template <typename T>
-uintptr_t write_response(std::string &arg) {
-
-}
-
-template <typename T>
-uintptr_t write_response(std::string &&arg) {
-
-}
-
-template <typename T>
-uintptr_t write_response(std::vector &arg) {
-
-}
-
-template <typename T>
-uintptr_t write_response(std::vector &&arg) {
-
-}
+} // namespace sdk
 
 #endif //FLUENCE_C_SDK_RR_H

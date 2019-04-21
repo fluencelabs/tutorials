@@ -1,0 +1,7 @@
+version: '3'
+services:
+  hello_world:
+    build:
+      context: .
+    volumes:
+     - .:/code
