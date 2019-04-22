@@ -8,9 +8,9 @@ const int RESPONSE_SIZE_BYTES = 4;
 char *invoke(const char *str, int length) {
     const size_t greeting_length = strlen(greeting);
     // TODO: add check for overflow
-    const size_t response_length = length + RESPONSE_SIZE_BYTES + greeting_length;
+    const size_t response_length = length + greeting_length;
 
-    char *response = (char *)allocate(response_length);
+    char *response = (char *)allocate(response_length + RESPONSE_SIZE_BYTES);
 
     wasm_log(str, length);
 
