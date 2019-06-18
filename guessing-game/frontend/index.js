@@ -12,13 +12,13 @@ window.onload = function () {
 	var tryNum = 1;
 
 	// address to Fluence contract in Ethereum blockchain. Interaction with blockchain created by MetaMask or with local Ethereum node
-	let contractAddress = "0xfb405cf664369d1f07668cb07649afbcd37af823";
+	let contractAddress = "0xeFF91455de6D4CF57C141bD8bF819E5f873c1A01";
 
 	// set ethUrl to `undefined` to use MetaMask instead of Ethereum node
 	let ethUrl = "http://geth.fluence.one:8545";
 
 	// application to interact with that stored in Fluence contract
-	let appId = "2";
+	let appId = "3";
 
 	// save fluence to global variable, so it can be accessed from Developer Console
 	window.fluence = fluence;
