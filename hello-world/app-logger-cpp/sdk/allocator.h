@@ -13,7 +13,7 @@ namespace sdk {
  * @param size a size of allocated memory region.
  * @return a pointer to the allocated memory region.
  */
-void *allocate(size_t size);
+extern "C" void *allocate(size_t size);
 
 /**
  * Frees a memory region.
@@ -24,7 +24,7 @@ void *allocate(size_t size);
  * @param ptr a pointer to the previously allocated memory region.
  * @param size a size of the previously allocated memory region.
  */
-void deallocate(void *ptr, size_t size);
+extern "C" void deallocate(void *ptr, size_t size);
 
 }
 
