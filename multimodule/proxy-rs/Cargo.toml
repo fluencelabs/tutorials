@@ -18,5 +18,5 @@ crate-type = ["cdylib"]
 panic = "abort"
 
 [dependencies]
-fluence = { version = "0.1.0" }
+fluence = { version = "0.1.5" }
 byteorder = { version = "1" }
