@@ -4,7 +4,8 @@
 /**
  * Writes provided string to Wasm VM logger.
  *
- * @param log_message a message that should be logged.
+ * @param str a pointer to a message that should be logged.
+ * @param len a size of a message that should be logged.
  */
 void wasm_log(const char *str, int len);
 
