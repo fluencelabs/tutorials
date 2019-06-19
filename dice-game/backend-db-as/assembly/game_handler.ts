@@ -48,7 +48,7 @@ export function handler(requestStr: string): string {
         log("Unknown request\n");
         let r = request as UnknownRequest;
         let error = new ErrorResponse(r.message);
-        let response = error.serialize();
+        response = error.serialize();
         memory.free(changetype<usize>(error));
     } else {
         let error = new ErrorResponse("Unreachable.");
