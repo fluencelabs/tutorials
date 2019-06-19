@@ -22,9 +22,9 @@ T read_request(char *ptr, int length) {
 }
 
 /**
- * Writes response to format suitable for Wasm VM.
+ * Writes response to the Wasm VM format.
  *
- * @param arg a response that should be writed.
+ * @param arg a response that should be written.
  * @return length a pointer to written buffer.
  */
 template <typename T>
