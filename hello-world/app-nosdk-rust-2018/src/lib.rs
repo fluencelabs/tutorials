@@ -28,15 +28,15 @@ pub unsafe fn invoke(ptr: *mut u8, len: usize) -> NonNull<u8> {
     let user_name = String::from_utf8(raw_string).unwrap();
 
     let result = format!("Hello, world! From user {}", user_name);
-    const RESULT_SIZE_BYTES: usize = 4;
+    const RESPONSE_SIZE_BYTES: usize = 4;
 
     let result_len = result.len();
     let total_len = result_len
-        .checked_add(RESULT_SIZE_BYTES)
+        .checked_add(RESPONSE_SIZE_BYTES)
         .expect("usize overflow occurred");
 
     // converts array size to bytes in little-endian
-    let len_as_bytes: [u8; RESULT_SIZE_BYTES] = mem::transmute((result_len as u32).to_le());
+    let len_as_bytes: [u8; RESPONSE_SIZE_BYTES] = mem::transmute((result_len as u32).to_le());
 
     // allocates a new memory region for the result
     let result_ptr = allocate(total_len);
@@ -45,13 +45,13 @@ pub unsafe fn invoke(ptr: *mut u8, len: usize) -> NonNull<u8> {
     ptr::copy_nonoverlapping(
         len_as_bytes.as_ptr(),
         result_ptr.as_ptr(),
-        RESULT_SIZE_BYTES,
+        RESPONSE_SIZE_BYTES,
     );
 
     // copies array to memory
     ptr::copy_nonoverlapping(
         result.as_ptr(),
-        result_ptr.as_ptr().add(RESULT_SIZE_BYTES),
+        result_ptr.as_ptr().add(RESPONSE_SIZE_BYTES),
         result_len,
     );
 
