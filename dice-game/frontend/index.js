@@ -11,7 +11,7 @@ window.fluence = fluence;
 
 // convert result to a string
 window.getResultAsString = function (result) {
-	return result.result().then((r) => r.asString())
+	return result.then((r) => r.asString())
 };
 
 window.logResultAsString = function(result) {
@@ -30,7 +30,7 @@ Check out https://github.com/fluencelabs/tutorials for more Fluence examples
 
 If you have any questions, feel free to join our Discord https://fluence.chat :)
 
-`)
+`);
 
 window.onload = function () {
 	// locate html elements
