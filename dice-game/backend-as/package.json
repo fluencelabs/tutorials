@@ -6,19 +6,18 @@
   "scripts": {
     "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --use abort='' --sourceMap --validate",
     "asbuild": "npm run asbuild:optimized",
-    "asbuild:test": "npm run asbuild:test:roundtrip",
-    "asbuild:test:roundtrip": "npx asc tests/assembly/roundtrip.spec.as.ts -b tests/build/roundtrip.wasm -t tests/build/roundtrip.wat --validate --sourceMap --importMemory"
+    "//": "'test' command will work only if comment export functions in logger.ts",
+    "test": "asp"
   },
   "author": "",
   "license": "Apache 2.0",
   "devDependencies": {
-    "@types/node": "^10.12.3",
-    "ts-node": "^7.0.1",
-    "typedoc": "^0.13.0",
-    "typescript": "^3.1.6"
+    "assemblyscript": "github:assemblyscript/assemblyscript",
+    "as-pect": "github:jtenner/as-pect",
+    "@as-pect/cli": "^2.2.0"
   },
   "dependencies": {
-    "assemblyscript": "fluencelabs/assemblyscript",
-    "assemblyscript-json": "github:fluencelabs/assemblyscript-json"
+    "assemblyscript": "assemblyscript/assemblyscript",
+    "assemblyscript-json": "github:fluencelabs/assemblyscript-json#update-as1"
   }
 }

@@ -16,8 +16,10 @@ export class JoinResponse extends Response {
 
     serialize(): string {
         let encoder = new JSONEncoder();
+        encoder.pushObject(null);
         encoder.setString("action", "Join");
-        encoder.setInteger("playerId", this.playerId);
+        encoder.setInteger("player_id", this.playerId);
+        encoder.popObject();
 
         return encoder.toString();
     }
@@ -34,9 +36,11 @@ export class RollResponse extends Response {
 
     serialize(): string {
         let encoder = new JSONEncoder();
+        encoder.pushObject(null);
         encoder.setString("action", "Roll");
         encoder.setInteger("outcome", this.outcome as i64);
         encoder.setInteger("player_balance", this.playerBalance as i64);
+        encoder.popObject();
 
         return encoder.toString();
     }
@@ -50,8 +54,10 @@ export class GetBalanceResponse extends Response {
 
     serialize(): string {
         let encoder = new JSONEncoder();
+        encoder.pushObject(null as string);
         encoder.setString("action", "GetBalance");
-        encoder.setInteger("playerBalance", this.playerBalance as i32);
+        encoder.setInteger("player_balance", this.playerBalance as i32);
+        encoder.popObject();
 
         return encoder.toString();
     }
@@ -65,8 +71,10 @@ export class ErrorResponse extends Response {
 
     serialize(): string {
         let encoder = new JSONEncoder();
+        encoder.pushObject(null);
         encoder.setString("action", "Error");
         encoder.setString("message", this.message);
+        encoder.popObject();
 
         return encoder.toString();
     }
