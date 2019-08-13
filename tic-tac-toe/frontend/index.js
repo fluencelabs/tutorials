@@ -4,16 +4,7 @@ import * as fluence from "fluence";
 // save fluence to global variable, so it can be accessed from Developer Console
 window.fluence = fluence;
 
-// convert result to a string
-window.getResultString = function (result) {
-	return result.result().then((r) => JSON.parse(r.asString()))
-};
-
-window.logResultAsString = function(result) {
-	return getResultString(result).then((r) => console.log(r))
-};
-
-window.onload = function () {
+window.onload = async function () {
 
 	// address to Fluence contract in Ethereum blockchain. Interaction with blockchain created by MetaMask or with local Ethereum node
 	let contractAddress = "0xeFF91455de6D4CF57C141bD8bF819E5f873c1A01";
@@ -25,10 +16,8 @@ window.onload = function () {
 	let appId = "4";
 
 	// create a session between client and backend application
-	fluence.connect(contractAddress, appId, ethUrl).then((s) => {
-		console.log("Session created");
-		window.session = s;
-	});
+	window.session = await fluence.connect(contractAddress, appId, ethUrl);
+	console.log("Session created");
 
 	let BOARD_SIZE = 3;
 	let boxes = [];
@@ -66,7 +55,7 @@ window.onload = function () {
 		});
 	}
 
-	function newGame() {
+	async function newGame() {
 		let request = JSON.stringify({
 			action: "CreateGame",
 			player_name: player_name
@@ -76,17 +65,14 @@ window.onload = function () {
 
 		resultDiv.hidden = true;
 
-		getResultString(session.request(request)).then((r) => {
-
-			player_tile = r.player_tile;
-			initState(r);
-			console.log("response: " + JSON.stringify(r));
-
-		});
+		let r = await session.request(request);
+		let result = JSON.parse(r.asString());
+		player_tile = result.player_tile;
+		initState(result);
+		console.log("response: " + JSON.stringify(result));
 	}
 
-	function loginGame() {
-
+	async function loginGame() {
 		let name = document.getElementById("login").value;
 
 		if (name) {
@@ -97,14 +83,15 @@ window.onload = function () {
 
 			console.log("request: " + request);
 
-			getResultString(session.request(request)).then((r) => {
-				initState(r);
-				gameBoard.hidden = false;
-				console.log("response: " + JSON.stringify(r));
-				resultScreen(r);
-				player_name = name;
-				loginContainer.hidden = true;
-			});
+			let r = await session.request(request);
+			let result = JSON.parse(r.asString());
+
+			initState(result);
+			gameBoard.hidden = false;
+			console.log("response: " + JSON.stringify(result));
+			resultScreen(result);
+			player_name = name;
+			loginContainer.hidden = true;
 		} else {
 			console.log("login no name")
 		}
@@ -133,7 +120,7 @@ window.onload = function () {
 		}
 	}
 
-	function playerMove(name, x, y) {
+	async function playerMove(name, x, y) {
 		let request = JSON.stringify({
 			action: "PlayerMove",
 			player_name: name,
@@ -142,12 +129,13 @@ window.onload = function () {
 
 		console.log("request: " + request);
 
-		getResultString(session.request(request)).then((r) => {
-			console.log("response: " + JSON.stringify(r));
-			// trick because server returns unsuitable coords if there is no coords
-			if (r.coords[0] >= 0 && r.coords[0] <= 2) appMove(r);
-			if (r.winner !== "None") resultScreen(r);
-		});
+		let r = await session.request(request);
+		let result = JSON.parse(r.asString());
+
+		console.log("response: " + JSON.stringify(result));
+		// trick because server returns unsuitable coords if there is no coords
+		if (result.coords[0] >= 0 && result.coords[0] <= 2) appMove(result);
+		if (result.winner !== "None") resultScreen(result);
 	}
 
 	/*
@@ -179,14 +167,14 @@ window.onload = function () {
 		document.getElementById("tictactoe").appendChild(board);
 	}
 
-	function setAction() {
-		setInCell(this, player_tile, true)
+	async function setAction() {
+		await setInCell(this, player_tile, true)
 	}
 
-	function setInCell(el, tile, from_player) {
+	async function setInCell(el, tile, from_player) {
 		if (el.innerHTML === EMPTY) {
 			el.innerHTML = tile;
-			if (from_player) playerMove(player_name, el.game_row, el.game_col)
+			if (from_player) await playerMove(player_name, el.game_row, el.game_col)
 		}
 	}
 

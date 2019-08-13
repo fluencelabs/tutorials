@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as fluence from "fluence";
 
-window.onload = function () {
+window.onload = async function () {
 	// locate button
 	const helloBtn = document.querySelector('#submit');
 	// locate input text box
@@ -24,32 +24,20 @@ window.onload = function () {
 	window.fluence = fluence;
 
 	// create a session between client and backend application
-	fluence.connect(contractAddress, appId, ethUrl).then((s) => {
-		console.log("Session created");
-		window.session = s;
-		helloBtn.disabled = false;
-	});
-
-
-	// convert result to a string
-	window.getResultString = function (result) {
-		return result.result().then((r) => r.asString())
-	};
-
-	window.logResultAsString = function(result) {
-		return getResultString(result).then((r) => console.log(r))
-	}
+	window.session = await fluence.connect(contractAddress, appId, ethUrl);
+	console.log("Session created");
+	helloBtn.disabled = false;
 
 	// set callback on button click
 	helloBtn.addEventListener("click", send);
 	
 	// send input as a transaction and display results in grettingLbl
-	function send() {
+	async function send() {
+		helloBtn.disabled = true;
 		const input = inputLbl.value.trim();
-		let result = session.request(input);
-		getResultString(result).then(function (str) {
-			outputLbl.innerHTML = `<tr><td>#${tryNum++}:</td><td>${input}</td><td>${str}</td></tr>${outputLbl.innerHTML}`
-		});
+		let result = await session.request(input);
+		outputLbl.innerHTML = `<tr><td>#${tryNum++}:</td><td>${input}</td><td>${result.asString()}</td></tr>${outputLbl.innerHTML}`
+		helloBtn.disabled = false;
 	}
 
 };
