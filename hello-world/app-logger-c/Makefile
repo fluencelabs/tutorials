@@ -1,6 +1,6 @@
 TARGET = hello_world
 CC = /opt/wasi-sdk/bin/clang
-SYSROOT = /opt/wasi-sdk/share/sysroot
+SYSROOT = /opt/wasi-sdk/share/wasi-sysroot
 TARGET_TRIPLE = wasm32-unknown-wasi
 CFLAGS = -nostartfiles -fvisibility=hidden
 LDFLAGS = -Wl,--no-entry,--demangle,--allow-undefined
