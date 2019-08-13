@@ -9,15 +9,6 @@ window.info = globalInfo;
 // save fluence to global variable, so it can be accessed from Developer Console
 window.fluence = fluence;
 
-// convert result to a string
-window.getResultAsString = function (result) {
-	return result.result().then((r) => r.asString())
-};
-
-window.logResultAsString = function(result) {
-	return getResultAsString(result).then((r) => console.log(r))
-};
-
 console.log(`
 
 Thank you for trying Fluence out! Please, break something.
@@ -25,14 +16,13 @@ Thank you for trying Fluence out! Please, break something.
 You can find docs at https://fluence.dev
 
 Check out http://dash.fluence.network to deploy your own SQL DB instance
-Check out http://sql.fluence.network to play with your data via web interface
 Check out https://github.com/fluencelabs/tutorials for more Fluence examples
 
 If you have any questions, feel free to join our Discord https://fluence.chat :)
 
 `)
 
-window.onload = function () {
+window.onload = async function () {
 	// locate html elements
 	const statusDiv = document.getElementById('status');
 
@@ -55,26 +45,23 @@ window.onload = function () {
 	let appId = "2";
 
 	// create a session between client and backend application, and then join the game
-	fluence.connect(contractAddress, appId, ethUrl).then((s) => {
-		console.log("Session created");
-		window.session = s;
-	}).then(() => join());
+	window.session = await fluence.connect(contractAddress, appId, ethUrl);
+	console.log("Session created");
+	await join();
 
 	// send request to join the game
-	function join() {
-		let result = session.request(`{ "action": "Join" }`);
-		getResultAsString(result).then(function (str) {
-			let response = JSON.parse(str);
-			if (response.player_id || response.player_id === 0) {
-				statusDiv.innerText = "You joined to game. Your id is: " + response.player_id;
-				// 100 is hardcoded, because we always register a new player
-				updateBalance(100);
-				calcPrize();
-				startGame(response.player_id);
-			} else {
-				showError("Unable to register: " + str);
-			}
-		});
+	async function join() {
+		let result = await session.request(`{ "action": "Join" }`);
+		let response = JSON.parse(result.asString());
+		if (response.player_id || response.player_id === 0) {
+			statusDiv.innerText = "You joined to game. Your id is: " + response.player_id;
+			// 100 is hardcoded, because we always register a new player
+			updateBalance(100);
+			calcPrize();
+			startGame(response.player_id);
+		} else {
+			showError("Unable to register: " + str);
+		}
 	}
 
 	// hide registration, show game controls and balance
@@ -105,20 +92,18 @@ window.onload = function () {
 	}
 
 	// roll the dice by sending a request to backend, show the outcome and balance
-	function roll() {
+	async function roll() {
 		if (checkInput()) {
 			resultDiv.innerHTML = "";
 			let request = rollRequest();
-			let result = session.request(JSON.stringify(request));
-			getResultAsString(result).then(str => {
-				let response = JSON.parse(str);
-				if (response.outcome) {
-					showResult(parseInt(response.outcome), request.bet_placement);
-					updateHistoryTable(request, response);
-				} else {
-					showError("Unable to roll: " + str);
-				}
-			});
+			let result = await session.request(JSON.stringify(request));
+			let response = JSON.parse(result.asString());
+			if (response.outcome) {
+				showResult(parseInt(response.outcome), request.bet_placement);
+				updateHistoryTable(request, response);
+			} else {
+				showError("Unable to roll: " + str);
+			}
 		}
 	}
 
@@ -179,15 +164,13 @@ window.onload = function () {
 	}
 
 	// hackity-hack! we could get balance for any player
-	function getBalance(id) {
-		let result = session.request(`{ "player_id": ${id}, "action": "GetBalance"}`);
-		return getResultAsString(result).then(function (str) {
-			let response = JSON.parse(str);
-			if (response.player_balance) {
-				updateBalance(response.player_balance)
-			} else {
-				showError("Unable to get balance: " + str);
-			}
-		});
+	async function getBalance(id) {
+		let result = await session.request(`{ "player_id": ${id}, "action": "GetBalance"}`);
+		let response = JSON.parse(result.asString());
+		if (response.player_balance) {
+			updateBalance(response.player_balance)
+		} else {
+			showError("Unable to get balance: " + str);
+		}
 	}
 };
