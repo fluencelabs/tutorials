@@ -3,11 +3,11 @@ import {loggedStringHandler} from "../node_modules/assemblyscript-sdk/assembly/i
 import {log} from "../node_modules/assemblyscript-sdk/assembly/logger";
 
 export function allocate(size: usize) :i32 {
-  return __alloc(size, 1);
+  return __alloc(size, 0);
 }
 
 export function deallocate(ptr: i32, size: usize): void {
-
+    __reset();
 }
 
 export function invoke(ptr: i32, size: i32): i32 {

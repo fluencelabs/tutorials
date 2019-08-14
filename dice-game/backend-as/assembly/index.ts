@@ -1,7 +1,7 @@
 import {handler} from "./game_handler";
 
 export function allocate(size: i32) :i32 {
-  return __alloc(size, 1);
+  return __alloc(size, 0);
 }
 
 export function deallocate(ptr: i32, size: i32): void {
