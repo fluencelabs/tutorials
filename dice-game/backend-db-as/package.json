@@ -5,21 +5,14 @@
   "main": "index.js",
   "scripts": {
     "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --use abort='' --sourceMap --validate",
-    "asbuild": "npm run asbuild:optimized",
-    "asbuild:test": "npm run asbuild:test:roundtrip",
-    "asbuild:test:roundtrip": "npx asc tests/assembly/roundtrip.spec.as.ts -b tests/build/roundtrip.wasm -t tests/build/roundtrip.wat --validate --sourceMap --importMemory"
+    "asbuild": "npm run asbuild:optimized"
   },
   "author": "",
   "license": "Apache-2.0",
-  "devDependencies": {
-    "@types/node": "^10.14.4",
-    "ts-node": "^7.0.1",
-    "typedoc": "^0.13.0",
-    "typescript": "^3.4.2"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "assemblyscript": "github:fluencelabs/assemblyscript",
-    "assemblyscript-json": "github:fluencelabs/assemblyscript-json",
+    "assemblyscript": "assemblyscript/assemblyscript",
+    "assemblyscript-json": "github:fluencelabs/assemblyscript-json#update-as1",
     "assemblyscript-sdk": "github:fluencelabs/assemblyscript-sdk",
     "db-connector": "github:fluencelabs/db-connector",
     "signature-connector": "github:fluencelabs/signature-connector"

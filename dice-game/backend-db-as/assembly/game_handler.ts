@@ -7,12 +7,12 @@ import {checkSignature} from "../node_modules/signature-connector/assembly/index
 let gameManager = new GameManager();
 
 export function string2Bytes(str: string): Uint8Array {
-    let utf8ptr = str.toUTF8();
-    let buffer = new Uint8Array(str.lengthUTF8);
-    for (let i = 0; i <  buffer.length; i++) {
-        buffer[i] = load<u8>(utf8ptr + i);
-    }
-    return buffer.subarray(0, buffer.length - 1);
+    return Uint8Array.wrap(String.UTF8.encode(str));
+}
+
+function errorResponse(msg: string): string {
+    let error = new ErrorResponse(msg);
+    return error.serialize();
 }
 
 // returns string, because serialization to a byte array is not compatible with our invoke handlers
@@ -25,35 +25,41 @@ export function handler(requestStr: string): string {
         let checkResult = checkSignature(requestStr);
 
         if (!checkResult.checkPassed) {
-            log("Error check signature: " + checkResult.errorMessage)
+            let errorMsg = checkResult.errorMessage as string;
+            log("Error check signature: " + errorMsg)
         }
     }
 
-    let request: Request = decode(string2Bytes(requestStr));
-
-    let response: string;
+    let requestBytes = string2Bytes(requestStr);
+    let request: Request = decode(requestBytes);
 
     if (request.action == Action.Join) {
         log("Handling Join request\n");
-        response = gameManager.join();
+        return gameManager.join();
     } else if (request.action == Action.Roll) {
         log("Handling Roll request\n");
         let r = request as RollRequest;
-        response = gameManager.roll(r.playerId, r.betPlacement, r.betSize);
+        if (!r.betPlacementExists || !r.betSizeExists || !r.playerIdExists) {
+            let msg = "Request does not match schema. Missing fields: ";
+            if (!r.betPlacementExists) msg = msg + "'bet_placement',";
+            if (!r.betSizeExists) msg = msg + "'bet_size',";
+            if (!r.playerIdExists) msg = msg + "'player_id'";
+            return errorResponse(msg)
+        }
+        return gameManager.roll(r.playerId, r.betPlacement, r.betSize);
     } else if (request.action == Action.GetBalance) {
         log("Handling GetBalance request\n");
         let r = request as GetBalanceRequest;
-        response = gameManager.getBalance(r.playerId);
+        if (!r.playerIdExists) {
+            return errorResponse("Request does not match schema. Required fields: 'player_id'")
+        }
+        return gameManager.getBalance(r.playerId);
     } else if (request.action == Action.Unknown) {
         log("Unknown request\n");
         let r = request as UnknownRequest;
-        let error = new ErrorResponse(r.message);
-        response = error.serialize();
-        memory.free(changetype<usize>(error));
-    } else {
-        let error = new ErrorResponse("Unreachable.");
-        response = error.serialize();
+        return errorResponse(r.message)
     }
 
-    return response;
+    let response = new ErrorResponse("Unreachable.");
+    return response.serialize();
 }

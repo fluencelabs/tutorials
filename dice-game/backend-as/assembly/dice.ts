@@ -1,5 +1,4 @@
-import {JSONEncoder} from "../node_modules/assemblyscript-json/assembly/encoder";
-import {ErrorResponse, GetBalanceResponse, JoinResponse, Response, RollResponse} from "./response";
+import {ErrorResponse, GetBalanceResponse, JoinResponse, RollResponse} from "./response";
 
 const PLAYERS_MAX_COUNT: i32 = 1024;
 const SEED: u64 = 123456;
@@ -34,8 +33,7 @@ export class GameManager {
 
         this.registeredPlayers = this.registeredPlayers + 1;
 
-        let resultStr = response.serialize();
-        return resultStr;
+        return response.serialize();
     }
 
     roll(playerId: u64, betPlacement: u8, betSize: u64): string {
@@ -70,9 +68,7 @@ export class GameManager {
         this.playerBalance.set(playerId, newBalance);
 
         let response = new RollResponse(outcome, newBalance);
-        let resultStr = response.serialize();
-        memory.free(changetype<usize>(response));
-        return resultStr;
+        return response.serialize();
     }
 
     getBalance(playerId: u64): string {

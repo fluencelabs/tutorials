@@ -10,10 +10,6 @@ export enum Action {
 
 export abstract class Request {
     public action: Action = null;
-
-    clear(): void {
-
-    }
 }
 
 export class UnknownRequest extends Request {
@@ -25,11 +21,6 @@ export class UnknownRequest extends Request {
         this.message = message;
     }
 
-    clear(): void {
-        super.clear();
-        memory.free(changetype<usize>(this.message));
-    }
-
 }
 export class JoinRequest extends Request {
     constructor() {
@@ -39,26 +30,29 @@ export class JoinRequest extends Request {
 }
 export class RollRequest extends Request {
     public readonly playerId: u64;
-    public betPlacement: u8;
-    public betSize: u32;
-    constructor(playerId: u64, betPlacement: u8, betSize: u32) {
+    public readonly playerIdExists: boolean;
+    public readonly betPlacement: u8;
+    public readonly betPlacementExists: boolean;
+    public readonly betSize: u32;
+    public readonly betSizeExists: boolean;
+    constructor(playerId: u64, playerIdExists: boolean,  betPlacement: u8, betPlacementExists: boolean, betSize: u32, betSizeExists: boolean) {
         super();
         this.playerId = playerId;
+        this.playerIdExists = playerIdExists;
         this.betPlacement = betPlacement;
+        this.betPlacementExists = betPlacementExists;
         this.betSize = betSize;
+        this.betSizeExists = betSizeExists;
         this.action = Action.Roll;
-    }
-
-    clear(): void {
-        super.clear();
-        memory.free(changetype<usize>(this.playerId));
     }
 }
 export class GetBalanceRequest extends Request {
-    public playerId: u64;
-    constructor(playerId: u64) {
+    public readonly playerId: u64;
+    public readonly playerIdExists: boolean;
+    constructor(playerId: u64, playerIdExists: boolean) {
         super();
         this.playerId = playerId;
+        this.playerIdExists = playerIdExists;
         this.action = Action.GetBalance;
     }
 }
@@ -80,14 +74,12 @@ export function decode(bytes: Uint8Array): Request {
     if (action == "Join") {
         request = new JoinRequest();
     } else if (action == "Roll") {
-        request = new RollRequest(jsonHandler.playerId, jsonHandler.betPlacement, jsonHandler.betSize)
+        request = new RollRequest(jsonHandler.playerId, jsonHandler.playerIdExists, jsonHandler.betPlacement, jsonHandler.betPlacementExists, jsonHandler.betSize, jsonHandler.betSizeExists)
     } else if (action == "GetBalance") {
-        request = new GetBalanceRequest(jsonHandler.playerId)
+        request = new GetBalanceRequest(jsonHandler.playerId, jsonHandler.playerIdExists)
     } else {
         request = new UnknownRequest("There is no request with action: " + action);
     }
-
-    jsonHandler.clean();
 
     return request;
 }
@@ -96,14 +88,15 @@ class RequestJSONEventsHandler extends JSONHandler {
 
     public action: string;
     public playerId: u64;
+    public playerIdExists: boolean;
     public betPlacement: u8;
+    public betPlacementExists: boolean;
     public betSize: u32;
+    public betSizeExists: boolean;
     public outcome: u8;
+    public outcomeExists: boolean;
     public playerBalance: u64;
-
-    clean(): void {
-        memory.free(changetype<usize>(this.action));
-    }
+    public playerBalanceExists: boolean;
 
     setString(name: string, value: string): void {
         if (name == "action") {
@@ -114,16 +107,22 @@ class RequestJSONEventsHandler extends JSONHandler {
 
     setInteger(name: string, value: i64): void {
 
+        // hacks with `Exists` fields, because 0 and null is the same here
         if (name == "player_id") {
             this.playerId = value as u64;
+            this.playerIdExists = true;
         } else if (name == "bet_placement") {
             this.betPlacement = value as u8;
+            this.betPlacementExists = this.betPlacement != null;
         } else if (name == "bet_size") {
             this.betSize = value as u32;
+            this.betSizeExists = true;
         } else if (name == "outcome") {
             this.outcome = value as u8;
+            this.outcomeExists = this.outcome != null;
         } else if (name == "player_balance") {
             this.playerBalance = value as u64;
+            this.playerBalanceExists = this.playerBalance != null;
         }
 
         // json scheme is not strict, so we won't throw an error on excess fields

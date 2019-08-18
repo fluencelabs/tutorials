@@ -54,7 +54,7 @@ export class GetBalanceResponse extends Response {
 
     serialize(): string {
         let encoder = new JSONEncoder();
-        encoder.pushObject(null);
+        encoder.pushObject(null as string);
         encoder.setString("action", "GetBalance");
         encoder.setInteger("player_balance", this.playerBalance as i32);
         encoder.popObject();
