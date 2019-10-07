@@ -6,7 +6,7 @@ publish = false
 description = "Just a demo application for Fluence with logging ability based on Rust 2015 edition"
 
 [lib]
-name = "hello_world2_2015"
+name = "hello_world_2015"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 

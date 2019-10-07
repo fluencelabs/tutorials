@@ -5,14 +5,15 @@ TARGET_TRIPLE = wasm32-unknown-wasi
 CFLAGS = -nostartfiles -fvisibility=hidden
 LDFLAGS = -Wl,--no-entry,--demangle,--allow-undefined
 EXPORT_FUNCS = --export=allocate,--export=deallocate,--export=invoke
-SDK = sdk/allocator.c sdk/logger.c
+SDK = sdk/allocator.c sdk/logger.c sdk/syscalls_stubs.c
+SRC = main.c 
 
 .PHONY: default all clean
 
 default: $(TARGET)
 all: default
 
-$(TARGET): main.c $(SDK)
+$(TARGET): $(SRC) $(SDK)
 	$(CC) --sysroot=$(SYSROOT) --target=$(TARGET_TRIPLE) $(CFLAGS) $(LDFLAGS) -Wl,$(EXPORT_FUNCS) $^ -o $@.wasm
 
 .PRECIOUS: $(TARGET)

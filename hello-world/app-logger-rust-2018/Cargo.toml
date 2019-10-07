@@ -7,7 +7,7 @@ description = "Just a demo application for Fluence with logging ability based on
 edition = "2018"
 
 [lib]
-name = "hello_world2_2018"
+name = "hello_world_2018"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
@@ -19,4 +19,4 @@ panic = "abort"
 
 [dependencies]
 log = "0.4"
-fluence = { version = "0.1.5", features = ["wasm_logger"] }
+fluence = { version = "0.1.8", features = ["wasm_logger"] }
