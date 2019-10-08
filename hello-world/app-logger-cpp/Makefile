@@ -6,7 +6,7 @@ CFLAGS = -nostartfiles -fvisibility=hidden
 LDFLAGS = -Wl,--no-entry,--demangle,--allow-undefined
 EXPORT_FUNCS = --export=allocate,--export=deallocate,--export=invoke
 SDK = sdk/allocator.cpp sdk/logger.cpp sdk/syscalls_stubs.cpp
-SRC = main.cpp
+SRC = src/main.cpp
 
 .PHONY: default all clean
 
